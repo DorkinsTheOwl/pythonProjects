@@ -6,11 +6,12 @@ class SortedElement:
     index = -1
     h = -1
 
-    def compareTo(self, other):
+    def sort(self, other):
         if self.f != other.f:
             return self.comparison(self.f, other.f)
         else:
             return self.comparison(self.h, other.h)
+
 
     def comparison(self, num1, num2):
         if num1 == num2:
@@ -128,10 +129,10 @@ class AStarAlgorithm:
                             if se.f not in fDict:
                                 fDict[se.f] = []
                                 fList.append(se.f)
-                                fList.sort()  # I think this needs to call compareTo
+                                fList.sort()
 
                             fDict[se.f].append(len(minF.children) - 1)
-                            fDict[se.f].sort()  # I think this should call compareTo
+                            fDict[se.f].sort()
                             visited.append(key)
 
                 index += 1
@@ -196,7 +197,7 @@ class AStarAlgorithm:
             y = i // self.dim
             x = i - (y * self.dim)
 
-            ys = state[i] / self.dim
+            ys = state[i] // self.dim
             xs = state[i] - (ys * self.dim)
 
             res += y - ys + x - xs
