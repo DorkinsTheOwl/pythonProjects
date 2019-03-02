@@ -82,7 +82,7 @@ class AStarAlgorithm:
     def aStarGraphSearch(self, initial):
         graph = SortedElement()
         graph.state = initial
-        graph.h = None  # from c-sharp h (initial)
+        graph.h = self.h(initial)
         graph.f = graph.h
         graph.pathLen = 0
         graph.visited = False
