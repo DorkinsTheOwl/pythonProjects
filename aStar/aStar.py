@@ -1,17 +1,21 @@
+from colorama import Fore, Style
+
+
 class SortedElement:
     pathLen = -1
     f = -1
-    state = None
+    state = []
     visited = False
     index = -1
     h = -1
+    parent = None
+    children = []
 
     def sort(self, other):
         if self.f != other.f:
             return self.comparison(self.f, other.f)
         else:
             return self.comparison(self.h, other.h)
-
 
     def comparison(self, num1, num2):
         if num1 == num2:
@@ -28,18 +32,24 @@ class AStarAlgorithm:
         self.len = self.dim * self.dim
 
     def stateToKey(self, state):
-        return ''.join(str(e) for e in state)
+        return ','.join(str(e) for e in state)
 
     def printState(self, state, parentState):
-        print('PRINT STATE 1')
-        for index, val in enumerate(state):
-            print(str(val), end=' ')
+        print(Style.RESET_ALL, end='')
+        for i in range(0, len(state)):
 
-            if (index + 1) % self.dim == 0:
+            if state[i] != parentState[i]:
+                print(Fore.RED, end='')
+
+            print(state[i], end=' ')
+
+            if state[i] != parentState[i]:
+                print(Style.RESET_ALL, end='')
+
+            if (i + 1) % self.dim == 0:
                 print()
 
     def printState2(self, state):
-        print('PRINT STATE 2')
         for index, val in enumerate(state):
             print(str(val), end=' ')
             if (index + 1) % self.dim == 0:
@@ -47,7 +57,7 @@ class AStarAlgorithm:
 
     def printPathBackwards(self, minF, levelBackwards=0):
         if minF.parent is not None:
-            print(str(levelBackwards))
+            print(f'{levelBackwards}')
             self.printState(minF.state, minF.parent.state)
             self.printPathBackwards(minF.parent, levelBackwards + 1)
         else:
@@ -59,12 +69,11 @@ class AStarAlgorithm:
         se.state = initial
         se.pathLen = 0
         se.visited = False
-        tree = se
 
         visited = {}
         statesBeforeRequired = []
 
-        for i in range(0, depth):
+        for i in range(0, depth + 1):
             if i == 0:
                 statesBeforeRequired.append([])
                 visited[self.stateToKey(initial)] = True
@@ -75,7 +84,7 @@ class AStarAlgorithm:
                     newStates = self.expand(statesBeforeRequired[i - 1][j])
                     for newState in newStates:
                         key = self.stateToKey(newState)
-                        if key in visited:
+                        if key not in visited:
                             visited[key] = True
                             statesBeforeRequired[i].append(newState)
             print(f'States as depth {i}:{len(statesBeforeRequired[i])}')
@@ -95,9 +104,9 @@ class AStarAlgorithm:
         fDict[graph.f] = []
         fDict[graph.f].append(graph)
 
-        visited = []
+        visited = set()
         key = self.stateToKey(graph.state)
-        visited.append(key)
+        visited.add(key)
         index = 1
         while True:
             minF = None
@@ -117,7 +126,7 @@ class AStarAlgorithm:
                     newStates = self.expand(minF.state)
                     for val in newStates:
                         key = self.stateToKey(val)
-                        if key in visited:
+                        if str(key) not in visited:
                             se = SortedElement()
                             se.pathLen = minF.pathLen + 1
                             se.h = self.h(val)
@@ -125,20 +134,26 @@ class AStarAlgorithm:
                             se.state = val
                             se.parent = minF
                             minF.children.append(se)
+                            # se.children gets populated for no reason
+                            se.children = []  # not sure why I have to do this since I don't add anything to children
 
-                            if se.f not in fDict:
+                            if str(se.f) not in fDict:
                                 fDict[se.f] = []
                                 fList.append(se.f)
                                 fList.sort()
 
-                            fDict[se.f].append(len(minF.children) - 1)
-                            fDict[se.f].sort()
-                            visited.append(key)
+                            # for i, val in fDict[se.f]:
+                            #     print(f'{val.f}', end=' ')
+                            fDict[se.f].append(minF.children[len(minF.children) - 1])
+                            # print(minF.children[len(minF.children) - 1])
+                            print(f'minF children count in while: {len(minF.children) - 1}')
+                            fDict[se.f].sort(key=graph.sort)
+                            visited.add(key)
 
                 index += 1
 
     def selectStateToExpand(self, fDict, fList, minF):
-        for i, val in enumerate(fList):
+        for i in range(0, len(fList)):
             found = False
             while len(fDict[fList[i]]) > 0:
                 if fDict[fList[i]][0].visited:
@@ -150,7 +165,7 @@ class AStarAlgorithm:
 
             if found:
                 break
-
+        print(f'minF: {len(minF.children)}')
         return minF
 
     def expand(self, state):
@@ -193,13 +208,13 @@ class AStarAlgorithm:
             raise Exception(f'State does not have {str(self.len)} parameters')
 
         res = 0
-        for i, val in enumerate(state):
+        for i in range(0, len(state)):
             y = i // self.dim
             x = i - (y * self.dim)
 
             ys = state[i] // self.dim
             xs = state[i] - (ys * self.dim)
 
-            res += y - ys + x - xs
+            res += abs(y - ys) + abs(x - xs)
 
         return res
