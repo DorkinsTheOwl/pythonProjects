@@ -2,14 +2,15 @@ from colorama import Fore, Style
 
 
 class SortedElement:
-    pathLen = -1
-    f = -1
-    state = []
-    visited = False
-    index = -1
-    h = -1
-    parent = None
-    children = []
+    def __init__(self):
+        self.pathLen = -1
+        self.f = -1
+        self.state = []
+        self.visited = False
+        self.index = -1
+        self.h = -1
+        self.parent = None
+        self.children = []
 
     def sort(self, other):
         if self.f != other.f:
@@ -134,19 +135,13 @@ class AStarAlgorithm:
                             se.state = val
                             se.parent = minF
                             minF.children.append(se)
-                            # se.children gets populated for no reason
-                            se.children = []  # not sure why I have to do this since I don't add anything to children
 
                             if str(se.f) not in fDict:
                                 fDict[se.f] = []
                                 fList.append(se.f)
                                 fList.sort()
 
-                            # for i, val in fDict[se.f]:
-                            #     print(f'{val.f}', end=' ')
                             fDict[se.f].append(minF.children[len(minF.children) - 1])
-                            # print(minF.children[len(minF.children) - 1])
-                            print(f'minF children count in while: {len(minF.children) - 1}')
                             fDict[se.f].sort(key=graph.sort)
                             visited.add(key)
 
@@ -165,7 +160,6 @@ class AStarAlgorithm:
 
             if found:
                 break
-        print(f'minF: {len(minF.children)}')
         return minF
 
     def expand(self, state):
