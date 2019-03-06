@@ -136,7 +136,7 @@ class AStarAlgorithm:
                             se.parent = minF
                             minF.children.append(se)
 
-                            if str(se.f) not in fDict:
+                            if se.f not in fDict:
                                 fDict[se.f] = []
                                 fList.append(se.f)
                                 fList.sort()
