@@ -114,13 +114,13 @@ class AStarAlgorithm:
             minF = self.selectStateToExpand(fDict, fList, minF)
 
             if minF is None:
-                print('Goal state is not reachable')
+                print(f'Goal state is not reachable. Nodes visited: {index}')
                 break
             else:
                 minF.index = index
                 minF.visited = True
                 if minF.h == 0:
-                    print(f'Minimal path length - {minF.pathLen}; nodes visited: {str(index)}')
+                    print(f'Minimal path length - {minF.pathLen}; nodes visited: {index}')
                     self.printPathBackwards(minF)
                     break
                 else:
