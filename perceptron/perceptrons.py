@@ -76,25 +76,6 @@ class PerceptronUtilizingNumpy:
             if sumError <= 10.0:
                 break
 
-    # def prepareDataForTrain():
-    #     tweetsWithMarks = [tuple(i.strip('\n').split('\t')) for i in open('./trainingSet.txt', encoding='utf8').readlines()]
-    #     tweets = [i[1] for i in tweetsWithMarks]
-    #     binaryMarks = [int(i[0]) for i in tweetsWithMarks]
-    #
-    #     for i in range(3):
-    #         tweets = cleanText(tweets)
-    #
-    #     tfidf = TfidfVectorizer(min_df=2, max_df=0.5, stop_words=lvStopWords, ngram_range=(1, 2))
-    #     vocab = tfidf.fit(tweets).vocabulary_
-    #     with open('vocab.txt', 'w+', encoding='utf8') as f:
-    #         f.write(str(vocab))
-    #     tweets = tfidf.fit_transform(tweets).toarray()
-    #     binaryMarks = np.array(binaryMarks)
-    #     print('Adjusting weights')
-    #     arrayOfWeights = train(tweets, binaryMarks)
-    #     print('Weight adjustment complete')
-    #     np.savetxt('./listOfWeights2.txt', arrayOfWeights)
-
     def perceptron(self, trainTweets, trainResults, testTweets, testResults):
         print('Running...')
 
