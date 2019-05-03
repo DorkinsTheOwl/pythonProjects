@@ -1,4 +1,5 @@
 from colorama import Fore, Style
+import math
 
 
 class SortedElement:
@@ -19,10 +20,10 @@ class SortedElement:
             return self.h < other.h
 
 
-class AStarAlgorithmNPuzzle:
-    def __init__(self):
-        self.dim = 3
-        self.len = self.dim * self.dim
+class AStarAlgorithmNQueens:
+    def __init__(self, length):
+        self.len = length
+        self.dim = int(math.sqrt(length))
 
     def stateToKey(self, state):
         return ','.join(str(e) for e in state)
@@ -140,13 +141,13 @@ class AStarAlgorithmNPuzzle:
                 index += 1
 
     def selectStateToExpand(self, fDict, fList, minF):
-        for i in range(0, len(fList)):
+        for i, val in enumerate(fList):
             found = False
-            while len(fDict[fList[i]]) > 0:
-                if fDict[fList[i]][0].visited:
-                    del fDict[fList[i]][0]
+            while len(fDict[val]) > 0:
+                if fDict[val][0].visited:
+                    del fDict[val][0]
                 else:
-                    minF = fDict[fList[i]][0]
+                    minF = fDict[val][0]
                     found = True
                     break
 
@@ -155,52 +156,98 @@ class AStarAlgorithmNPuzzle:
         return minF
 
     def expand(self, state):
-        if len(state) != self.len:
-            raise Exception(f'State does not have {str(self.len)} parameters')
         res = []
         for i, val in enumerate(state):
-            if val == 0:
+            if val == 1:
                 y = i // self.dim
-                x = i - (y * self.dim)
-
-                if y - 1 >= 0:
+                x = i - y * self.dim
+                # if y is 0, queen can go down
+                if y == 0:
                     newState = state[:]
-                    newState[i] = newState[(y - 1) * self.dim + x]
-                    newState[(y - 1) * self.dim + x] = 0
-                    res.append(newState)
+                    # check whether or not another queen is blocking move
+                    if newState[i + self.dim] == 0:
+                        newState[i + self.dim] = 1
+                        newState[i] = 0
+                        res.append(newState)
 
-                if y + 1 < self.dim:
+                # if y is N-1, queen can go up
+                if y == self.dim - 1:
                     newState = state[:]
-                    newState[i] = newState[(y + 1) * self.dim + x]
-                    newState[(y + 1) * self.dim + x] = 0
-                    res.append(newState)
+                    # check whether or not another queen is blocking move
+                    if newState[i - self.dim] == 0:
+                        newState[i - self.dim] = 1
+                        newState[i] = 0
+                        res.append(newState)
 
-                if x - 1 >= 0:
+                # if 0 < y < N-1, queen can go up or down
+                if 0 < y < self.dim - 1:
+                    # check whether or not another queen is blocking move
                     newState = state[:]
-                    newState[i] = newState[y * self.dim + x - 1]
-                    newState[y * self.dim + x - 1] = 0
-                    res.append(newState)
+                    if newState[i + self.dim] == 0:
+                        newState[i + self.dim] = 1
+                        newState[i] = 0
+                        res.append(newState)
 
-                if x + 1 < self.dim:
+                    # check whether or not another queen is blocking move
                     newState = state[:]
-                    newState[i] = newState[y * self.dim + x + 1]
-                    newState[y * self.dim + x + 1] = 0
-                    res.append(newState)
+                    if newState[i - self.dim] == 0:
+                        newState[i - self.dim] = 1
+                        newState[i] = 0
+                        res.append(newState)
+
+                # if x is 0, queen can go right
+                if x == 0:
+                    # check whether or not another queen is blocking move
+                    newState = state[:]
+                    if newState[i + 1] == 0:
+                        newState[i + 1] = 1
+                        newState[i] = 0
+                        res.append(newState)
+
+                # if x is N-1, queen can go left
+                if x == self.dim - 1:
+                    # check whether or not another queen is blocking move
+                    newState = state[:]
+                    if newState[i - 1] == 0:
+                        newState[i - 1] = 1
+                        newState[i] = 0
+                        res.append(newState)
+
+                # if 0 < x < N-1, queen can go right or left
+                if 0 < x < self.dim - 1:
+                    # check whether or not another queen is blocking move
+                    newState = state[:]
+                    if newState[i + 1] == 0:
+                        newState[i + 1] = 1
+                        newState[i] = 0
+                        res.append(newState)
+
+                    # check whether or not another queen is blocking move
+                    newState = state[:]
+                    if newState[i - 1] == 0:
+                        newState[i - 1] = 1
+                        newState[i] = 0
+                        res.append(newState)
 
         return res
 
     def h(self, state):
-        if len(state) != self.len:
-            raise Exception(f'State does not have {str(self.len)} parameters')
-
         res = 0
-        for i in range(0, len(state)):
+        for i, val in enumerate(state):
+            if val == 0:
+                continue
+
             y = i // self.dim
-            x = i - (y * self.dim)
+            x = i - y * self.dim
 
-            ys = state[i] // self.dim
-            xs = state[i] - (ys * self.dim)
+            for j, nestedVal in enumerate(state):
+                if i == j or nestedVal == 0:
+                    continue
 
-            res += abs(y - ys) + abs(x - xs)
+                y1 = j // self.dim
+                x1 = j - y1 * self.dim
+                # row or column or diagonal
+                if x == x1 or y == y1 or abs(x1 - x) == abs(y1 - y):
+                    res += 1
 
         return res
